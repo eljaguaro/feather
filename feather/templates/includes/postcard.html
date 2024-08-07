@@ -1,0 +1,25 @@
+{% load thumbnail %}
+<article class="col-12 col-md-9">
+  <div style="background-color: whitesmoke; box-shadow: 0 0 30px rgba(0,0,0,0.5);padding:10px;">
+    <h3>
+      {{ post.headliner }}
+    </h3>
+    {% thumbnail post.image "3000x3000" upscale=True as im %}
+      <img style="margin: 0; object-fit:cover;" class="card-img my-2" src="{{ im.url }}" width="200" height="400" alt="">
+    {% endthumbnail %}
+      <p>
+        {{ post.text|truncatewords:"25" }}<a style="padding: 7px;border-radius:10px; text-decoration: none; color: rgb(54, 74, 255) ; margin-right: 7px;"  href="{% url 'posts:post_detail' post.pk %}">Читать далее </a> 
+      </p>
+      <!-- эта кнопка видна только автору -->
+      <a style="background-color: rgb(66, 65, 65);padding: 7px;border-radius:10px; text-decoration: none; color: tan ; margin-right: 7px;" href="{% url 'posts:profile' post.author.username %}">
+        Автор: {{ post.author }}
+      </a>
+      <!-- <a style="background-color: rgb(99, 30, 30);padding: 7px;border-radius:10px; text-decoration: none; color: rgb(255, 255, 255) ; margin-right: 7px;"  href="{% url 'posts:post_detail' post.pk %}">подробная информация </a>   -->
+      {% if post.group %}  
+      <a style="background-color: tan;padding: 7px;border-radius:10px; text-decoration: none; color: tan ; color: black;" href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{ post.group }}</a>
+      {% endif %}  
+      <a style="color: rgb(158, 95, 39);">
+        Дата публикации: {{ post.pub_date | date:"d E Y" }}
+      </a>
+    </div>
+</article>

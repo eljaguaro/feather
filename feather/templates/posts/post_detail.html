@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load user_filters %}
+{% block title %}
+Пост {{ title }}
+{% endblock %}
+{% block content %}
+<div class="col", style="margin-left: 0%;">
+  <article class="col-12 col-md-12">
+    {% thumbnail post.image "3000x3000" upscale=True as im %}
+      <img style="margin: 0; object-fit:cover; object-position: 20% 10%;" class="card-img my-2" src="{{ im.url }}" width="800" height="400" alt="">
+    {% endthumbnail %}
+    <div style="box-shadow: 0 0 10px rgba(0,0,0,0.5);padding: 10px;">
+      <h5>
+        {{ post.text }}
+      </h5>
+      {% if is_author %}
+      <a style="background-color: tan;padding: 7px;border-radius:10px; text-decoration: none; color: black ;" href="{% url 'posts:post_edit' post.pk %}">
+        редактировать запись
+      </a>  
+      {% endif %}    
+    </div>
+  </article>
+  <div, style="padding: 3%;">
+  </div>
+  <aside class="col-12 col-md-3">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        Дата публикации: {{ post.pub_date }}
+      </li>               
+      <li class="list-group-item">
+        {% if post.group %}   
+        <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+        {% endif %}   
+      </li>  
+      <li class="list-group-item">
+        Автор: {{ post.author }}
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Всего постов автора:  <span> {{ postsnum }} </span>
+      </li>
+      <li class="list-group-item">
+        <a href="{% url 'posts:profile' author %}">
+          все посты пользователя
+        </a>
+      </li>
+    </ul>
+  </aside>
+  {% if user.is_authenticated %}
+  <form method="post" action="{% url 'posts:add_comment' post.id %}">
+    {% csrf_token %}      
+    <section id="app", style="	max-width: 570px;
+    margin: 10px;
+    background: rgb(215, 162, 91);
+    border-radius: 18px;
+    padding: 10px;">
+    <div class="container">
+      <div class="row">
+        <div class="col-6">
+          <div class="comment">
+        <p v-for="items in item" v-text="items"></p>
+          </div><!--End Comment-->
+          </div><!--End col -->
+          </div><!-- End row -->
+      <div class="row" style="padding: 1%;">
+          <textarea name="text" cols="20" rows="5" class="form-control" required id="id_text", style="background-color: blanchedalmond;" placeholder="Можете добавить свой комментарий"></textarea>{% if is_edit %}{{ form.text }}{% endif %}</textarea>
+          <button type="submit" class="btn btn-primary" , style="background-color: rgb(207, 114, 0);">Добавить комментарий</button>
+        </div><!-- End col -->
+      </div><!--End Row -->
+    </div><!--End Container -->
+  </form>
+  </section>
+  <!-- <div class="card my-4", style="padding:10px; width:500px; height:70px"> -->
+    <!-- <h5 class="card-header">Добавить комментарий:</h5> -->
+    
+    <!-- <div class="card-body"> -->
+      <!-- <form method="post" action="{% url 'posts:add_comment' post.id %}">
+        {% csrf_token %}       -->
+        <!-- <div class="form-group mb-2", style="padding:10px; width:500px; height:30px">
+          {{ form.text }}
+        </div>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+      </form>
+    </div> -->
+  </div>
+{% endif %}
+<div class="comment-thread", style="background-color: wheat;">
+  {% for comment in comments %}
+  <details open class="comment", style="background-color: beige;">
+            <div class="comment-info">
+              <a href="{% url 'posts:profile' comment.author.username %}">
+                {{ comment.author.username }}
+              </a>
+                <p class="m-0">
+                    {{ comment.created }}
+                </p>
+                <p class="m-0">
+                  {% if comment.answer_to %}
+                    {{ comment.answer_to.text|truncatechars:"10" }}
+                    <!-- {% if comment.answer_to.text|length > 10 %} -->
+                      <!-- ... -->
+                    <!-- {% endif %} -->
+                  by {{ comment.answer_to.author.username }}
+                  {% endif %}
+              </p>
+            </div>
+        </div>
+    </summary>
+  </details>
+
+      <div class="comment-body", style="background-color: wheat; margin-bottom: 2%;">
+          <p>
+              {{ comment.text }}
+          </p>
+          <!-- <button type="button" data-toggle="reply-form" data-target="comment-1-reply-form">Ответить</button> -->
+          {% if user.is_authenticated %}
+          {% if comment.author == user %}
+            <a style="padding: 7px;border-radius:10px; text-decoration: none; color: rgb(255, 0, 0) ; margin-right: 7px;"  href="{% url 'posts:delete_comment' post.pk comment.pk %}">Удалить комментарий </a> 
+          {% endif %}
+          <details closed type="button" class="comment", style="background-color: beige;">
+            <summary>Ответить</summary> 
+              <form method="post" action="{% url 'posts:add_answer' post.id comment.id %}">
+                {% csrf_token %}      
+                <section id="app", style="	max-width: 570px;
+                margin: 10px;
+                background: rgb(215, 162, 91);
+                border-radius: 18px;
+                padding: 10px;">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="comment">
+                    <p v-for="items in item" v-text="items"></p>
+                      </div><!--End Comment-->
+                      </div><!--End col -->
+                      </div><!-- End row -->
+                  <div class="row" style="padding: 1%;">
+                      <textarea name="text" cols="20" rows="2" class="form-control" required id="id_text", style="background-color: blanchedalmond;" placeholder="Можете добавить свой ответ"></textarea>{% if is_edit %}{{ form.text }}{% endif %}</textarea>
+                      <button type="submit" class="btn btn-primary" , style="background-color: rgb(207, 114, 0);">Ответить</button>
+                    </div><!-- End col -->
+                  </div><!--End Row -->
+                </div><!--End Container -->
+              </form>
+              </section>
+          </details>
+        </div>
+        {% endif %}
+        </div>
+    </summary>
+  </details>
+      </div>
+  {% endfor %} 
+</div>     
+<!-- 
+{% for comment in comments %}
+  <div class="media mb-4">
+    <div class="media-body">
+      <h5 class="mt-0">
+        <a href="{% url 'posts:profile' comment.author.username %}">
+          {{ comment.author.username }}
+        </a>
+      </h5>
+      <p>
+        {{ comment.text }}
+      </p>
+    </div>
+  </div>
+{% endfor %} 
+</div>     
+{% endblock %} --> -->

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}
+Профайл пользователя {{ author.username }}
+{% endblock %}
+{% block content %}
+<div class="person-item__card__description">
+  {% if author.logo %}
+    <div class="person-item__card__occupation", style="margin-bottom: 7px;">
+      <img style="height: 195px; width: 1519px; object-fit: cover;" src="/media/{{ author.logo }}">
+    </div>
+  {% endif %}
+  <div class="person-item__card__header">
+
+      <h1 class="person-item__card__title">
+        {{ author.first_name }}  {{ author.last_name }}
+      </h1>
+
+      <p class="person-item__card__subtitle", style="color: gray;">
+          @{{ author.username }}
+      </p>
+
+  </div>
+
+  <div class="person-item__card__details">
+
+      <div class="person-item__card__point-wrapper">
+        <div class="person-item__card__term">
+          Страна
+      </div>
+      <div class="person-item__card__occupation", style="margin-bottom: 7px;">
+        <img style="height: 32px; width: 32px" src="https://flagsapi.com/{{ author.country }}/shiny/64.png">
+      </div>
+    </div>
+  </div>
+      <div class="container py-5">        
+        <h1>Все посты пользователя {{ author.username }}</h1>
+        <h3>Всего постов: {{ postsnum }} </h3>
+        {% if not sameuser %}  
+        {% if following %}
+        <a
+          class="btn btn-lg btn-light"
+          href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+        >
+          Отписаться
+        </a>
+      {% else %}
+          <a style="background-color: rgb(189, 0, 0); border-color: rgb(189, 0, 0);"
+            class="btn btn-lg btn-primary"
+            href="{% url 'posts:profile_follow' author.username %}" role="button"
+          >
+            Подписаться
+          </a>
+        {% endif %}   
+        {% endif %}  
+        {% for post in page_obj %}
+        <article>
+          {% include 'includes/postcard.html' %}
+        </article>
+        <hr>
+        <!-- Остальные посты. после последнего нет черты -->
+        <!-- Здесь подключён паджинатор -->  
+        {% endfor %}
+      </div>
+      {% include 'includes/paginator.html' %}
+    {% endblock %}
